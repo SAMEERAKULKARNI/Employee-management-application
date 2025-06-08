@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee Management System</title>
+</head>
+<body>
+    <h2>Employee Management</h2>
+
+    <form id="employeeForm">
+        <input type="text" id="name" placeholder="Name" required><br><br>
+        <input type="email" id="email" placeholder="Email" required><br><br>
+        <input type="text" id="department" placeholder="Department" required><br><br>
+        <button type="submit">Add Employee</button>
+    </form>
+
+    <h3>All Employees</h3>
+    <ul id="employeeList"></ul>
+
+    <script>
+        const loadEmployees = () => {
+            fetch("http://localhost:8080/employees")
+                .then(response => response.json())
+                .then(data => {
+                    const list = document.getElementById("employeeList");
+                    list.innerHTML = "";
+                    data.forEach(emp => {
+                        const item = document.createElement("li");
+                        item.textContent = `${emp.name} - ${emp.email} - ${emp.department}`;
+                        list.appendChild(item);
+                    });
+                });
+        };
+
+        document.getElementById("employeeForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            fetch("http://localhost:8080/employees", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    department: document.getElementById("department").value
+                })
+            })
+            .then(() => {
+                loadEmployees();
+                document.getElementById("employeeForm").reset();
+            });
+        });
+
+        window.onload = loadEmployees;
+    </script>
+</body>
+</html>
